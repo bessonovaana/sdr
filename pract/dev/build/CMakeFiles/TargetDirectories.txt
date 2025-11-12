@@ -1,0 +1,3 @@
+/home/anastasia/Рабочий стол/sdr/pract/dev/build/CMakeFiles/main.dir
+/home/anastasia/Рабочий стол/sdr/pract/dev/build/CMakeFiles/edit_cache.dir
+/home/anastasia/Рабочий стол/sdr/pract/dev/build/CMakeFiles/rebuild_cache.dir
