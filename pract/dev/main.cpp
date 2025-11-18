@@ -52,11 +52,13 @@ size_t tx_mtu = SoapySDRDevice_getStreamMTU(sdr, txStream);
 int16_t tx_buff[2*tx_mtu];
 int16_t rx_buffer[2*rx_mtu];
     //заполнение tx_buff значениями сэмплов первые 16 бит - I, вторые 16 бит - Q.
-    for (int i = 0; i < 2 * tx_mtu; i+=2)
+   for (int i = 0; i < 2 * tx_mtu; i+=2)
     {
         // ЗДЕСЬ БУДУТ ВАШИ СЭМПЛЫ
-        tx_buff[i] = cos(i)*16000;   // I
-        tx_buff[i+1] = sin(i)*16000; // Q
+        double t = (double)(i / 2) / tx_mtu * 2.0 - 1.0;
+        double triangle_value = -(1.0 - fabs(t)) * (fabs(t) < 1.0);
+        tx_buff[i] = (int16_t)(triangle_value * 16000);   // I - треугольник
+        tx_buff[i+1] = 0; // Q = 0
     }
 
     //prepare fixed bytes in transmit buffer
