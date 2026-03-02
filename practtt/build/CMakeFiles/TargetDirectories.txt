@@ -1,0 +1,5 @@
+/home/anastasia/Рабочий стол/sdr/practtt/build/CMakeFiles/imgui.dir
+/home/anastasia/Рабочий стол/sdr/practtt/build/CMakeFiles/implot.dir
+/home/anastasia/Рабочий стол/sdr/practtt/build/CMakeFiles/main.dir
+/home/anastasia/Рабочий стол/sdr/practtt/build/CMakeFiles/edit_cache.dir
+/home/anastasia/Рабочий стол/sdr/practtt/build/CMakeFiles/rebuild_cache.dir
