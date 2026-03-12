@@ -5,11 +5,137 @@
 #include <stdint.h>
 #include <vector>
 #include <random>
-#include <complex.h>
-#include<iostream>
+#include <complex>
+#include <iostream>
+#include <thread>
+#include <GL/glew.h>
+#include <SDL2/SDL.h>
+#include <chrono>
+#include <atomic>
+#include <mutex>
+#include <cmath>
+#include <chrono>
+
+#include "../third_party/imgui/backends/imgui_impl_opengl3.h"
+#include "../third_party/imgui/backends/imgui_impl_sdl2.h"
+#include "../include/imgui.h"
+#include "../include/implot.h"
+
 
 
 using namespace std;
+
+struct Sharing{
+    vector<complex<float>>tx_samples;
+    vector<complex<float>>rx_samples;
+    atomic<bool> program_running{true};
+    atomic<bool>sdr_ready{false};
+    mutex mtx;
+    vector<float> sync;
+};
+
+Sharing shared;
+
+struct IQData {
+    vector<double> real;  // I компонента (синий)
+    vector<double> imag;  // Q компонента (красный)
+    vector<double> count; // Индексы для оси X
+};
+
+IQData extractIQ(const vector<complex<float>>& samples) {
+    IQData iq;
+    size_t n = samples.size();
+    
+    iq.real.reserve(n);
+    iq.imag.reserve(n);
+    iq.count.reserve(n);
+    
+    for (size_t i = 0; i < n; i++) {
+        iq.count.push_back((double)i);           
+        iq.real.push_back((double)samples[i].real());   
+        iq.imag.push_back((double)samples[i].imag()); 
+        //cout<<iq.real[i]<<endl;  
+    }
+    return iq;
+}
+
+void run_gui(){
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER);
+    SDL_Window* window = SDL_CreateWindow(
+        "Backend start", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+        1024, 768, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+    SDL_GLContext gl_context = SDL_GL_CreateContext(window);
+
+    glewExperimental = GL_TRUE;
+    glewInit();
+
+    ImGui::CreateContext();
+    ImPlot::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Включить Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Включить Gamepad Controls
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Включить Docking
+
+    ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
+    ImGui_ImplOpenGL3_Init("#version 330");
+
+    bool running = true;
+    while (running) {
+        SDL_Event event;
+        while (SDL_PollEvent(&event)) {
+            ImGui_ImplSDL2_ProcessEvent(&event);
+            if (event.type == SDL_QUIT) {
+                running = false;
+            }
+            
+        }
+
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplSDL2_NewFrame();
+        ImGui::NewFrame();
+        ImGui::DockSpaceOverViewport(0, nullptr, ImGuiDockNodeFlags_None);
+
+
+
+        IQData iq;
+        {
+            lock_guard<mutex> lock(shared.mtx);
+            if (!shared.rx_samples.empty()) {
+                iq = extractIQ(shared.rx_samples);
+            }
+        }
+
+ImGui::Begin("IQ Signals");
+if (ImPlot::BeginPlot("I/Q Time Domain")) {
+                ImPlot::PlotLine("I", iq.count.data(), iq.real.data(), iq.real.size());
+                ImPlot::PlotLine("Q", iq.count.data(), iq.imag.data(), iq.imag.size());
+                ImPlot::EndPlot();
+            }
+            ImGui::End();
+            ImGui::Begin("I/Q");
+            if (ImPlot::BeginPlot("Scatter")){
+                ImPlot::PlotScatter("IQ Data", iq.real.data(), iq.imag.data(), iq.real.size());
+                ImPlot::EndPlot();
+            }
+            ImGui::End();
+        ImGui::Render();
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+        SDL_GL_SwapWindow(window);
+        
+    }
+
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
+    ImPlot::DestroyContext();
+    ImGui::DestroyContext();
+    SDL_GL_DeleteContext(gl_context);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
+    
+}
 
 int16_t *read_pcm(const char *filename, size_t *sample_count)
 {
@@ -51,7 +177,7 @@ std::vector<int16_t> generate_bits (int size){
 
 vector<complex<float>> convolve(const vector<complex<float>>& x) {
     
-    vector<complex<float>> h = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+    vector<complex<float>> h = {0.1f,0.1f,0.1f,0.1f,0.1f,0.1f,0.1f,0.1f,0.1f,0.1f};
     
     int N = x.size();
     int M = h.size();
@@ -109,8 +235,8 @@ void to_file(vector<complex<float>>in, int16_t buff[], int size){
         //заполнение tx_buff значениями сэмплов первые 16 бит - I, вторые 16 бит - Q.
         for (int i = 0; i < size; i+=2)
         {
-            buff[i]=(int16_t)(in[k].real()*1600);
-            buff[i+1]=(int16_t)(in[k].imag()*1600);
+            buff[i]=(int16_t)(in[k].real()*16000.0f);
+            buff[i+1]=(int16_t)(in[k].imag()*16000.0f);
       k++;
       
         //     // ЗДЕСЬ БУДУТ ВАШИ СЭМПЛЫ
@@ -127,46 +253,53 @@ void to_file(vector<complex<float>>in, int16_t buff[], int size){
 vector<complex<float>> from_file(int16_t buff[], int size){
     vector<complex<float>> sv2;
     sv2.reserve(size / 2);
-    for (int i=0; i<size-1; i+=2){
-        float real_part = (float)buff[i]/1600.0f;
-        float imag_part = (float)buff[i+1]/1600.0f;
+    for (int i=0; i<size; i+=2){
+        float real_part = (float)buff[i]/16000;
+        float imag_part = (float)buff[i+1]/16000;
 
         sv2.push_back(complex<float>(real_part,imag_part));
     }
-    return convolve(sv2);
+    return sv2;
 }
 
-vector<complex<float>> sim_sync(std::vector<complex<float>> y){
-    
-    auto offset = 0;
-    const int Nsp =10;
-
-    float BnTs = 0.01;
+vector<float> offset(vector<complex<float>> matched) 
+{
+    int samples_per_symbol = 10;
+    int K1, K2, p1, p2 = 0;
+    float BnTs = 0.0001;
+    float Kp = 0.0002;
     float zeta = sqrt(2) / 2;
-    float Kp = 0.01;
-    
-    float teta =(BnTs/Nsp)/(zeta+(1/4*zeta));
-    float K1=(-4*zeta*teta)/(1 + 2 * teta*zeta + pow(teta,2))*Kp;
-    float K2=(-4*teta*teta)/(1 + 2 * teta*zeta + pow(teta,2))*Kp;
-    for (int ns =0; ns<y.size(); ns+=10){
-        auto n = offset;
-        float real_err = (y[ns+n].real()-y[n+ns+Nsp].real()) * y[n+(Nsp)/2+ns].real();
-        float imag_err = (y[ns+n].imag()-y[n+ns+Nsp].imag()) * y[n+(Nsp)/2+ns].imag();
-        float error = imag_err+real_err;
+    float theta = (BnTs / samples_per_symbol) / (zeta + (0.25 / zeta));
+    K1 = -4 * zeta * theta / ( (1 + 2 * zeta * theta + pow(theta,2)) * Kp);
+    K2 = -4 * pow(theta,2) / ( (1 + 2 * zeta * theta + pow(theta,2))* Kp);
+    int tau = 0;
+    float err;
+    vector<float> errof;
 
-        float p1 = error*K1;
-        float p2 = p2 + p1 + error*K2;
 
-        if (p2>1) {p2=p2 - 1;}
-        if (p2<1 ){p2+=1;}
+    for (int i = 0; i < matched.size(); i += samples_per_symbol)
+    {
+        err = (matched[i + samples_per_symbol + tau].real() - matched[i + tau]).real() * matched[i + (samples_per_symbol / 2) + tau].real() + (matched[i + samples_per_symbol + tau].imag() - matched[i + tau]).imag() * matched[i + (samples_per_symbol / 2) + tau].imag(); 
+        p1 = err * K1;
+        p2 =  p2 + p1 + err * K2;
 
-        int offset =round(p2*Nsp);
+        if (p2 > 1)
+        {
+            p2 = p2 - 1;
+        }
+
+        if (p2 < -1)
+        {
+            p2 = p2 + 1;
+        }
+        tau = ceil(p2 * samples_per_symbol);
+        errof.push_back(i + samples_per_symbol + tau);
+        }
+        return errof;
     }
 
-}
-int main(){
-    
-    SoapySDRKwargs args = {};
+void sdr_work(){
+SoapySDRKwargs args = {};
 
     SoapySDRKwargs_set(&args, "driver", "plutosdr");        // Говорим какой Тип устройства 
     if (1) {
@@ -181,7 +314,7 @@ int main(){
     SoapySDRKwargs_clear(&args);
 
     int sample_rate = 1e6;
-    int carrier_freq = 800e6;
+    int carrier_freq = 888e6;
     // Параметры RX части
     SoapySDRDevice_setSampleRate(sdr, SOAPY_SDR_RX, 0, sample_rate);
     SoapySDRDevice_setFrequency(sdr, SOAPY_SDR_RX, 0, carrier_freq , NULL);
@@ -193,8 +326,8 @@ int main(){
     // Инициализация количества каналов RX\\TX (в AdalmPluto он один, нулевой)
     size_t channels[] = {0};
     // Настройки усилителей на RX\\TX
-    SoapySDRDevice_setGain(sdr, SOAPY_SDR_RX, 1, 50.0); // Чувствительность приемника
-    SoapySDRDevice_setGain(sdr, SOAPY_SDR_TX, 1, -10.0);// Усиление передатчика
+    SoapySDRDevice_setGain(sdr, SOAPY_SDR_RX, 0, 50.0); // Чувствительность приемника
+    SoapySDRDevice_setGain(sdr, SOAPY_SDR_TX, 0, 50.0);// Усиление передатчика
 
     int channel_count = 1;
     // Формирование потоков для передачи и приема сэмплов
@@ -206,6 +339,7 @@ int main(){
     // Получение MTU (Maximum Transmission Unit), в нашем случае - размер буферов. 
     size_t rx_mtu = SoapySDRDevice_getStreamMTU(sdr, rxStream);
     size_t tx_mtu = SoapySDRDevice_getStreamMTU(sdr, txStream);
+
 
     // Выделяем память под буферы RX и TX
     int16_t tx_buff[2*tx_mtu];
@@ -239,6 +373,7 @@ int main(){
             tx_buff[10 + i] = 0xffff;
         }
 
+
     const long  timeoutUs = 400000;
     long long last_time = 0;
 
@@ -258,17 +393,41 @@ int main(){
 
     int cur_sample_in_file = 0;
 
+    
+
     // Начинается работа с получением и отправкой сэмплов
-    for (size_t buffers_read = 0; buffers_read < iteration_count; buffers_read++)
-    {
+   while (shared.program_running){
+   //for (size_t buffers_read = 0; buffers_read < iteration_count; buffers_read++){
+        
         void *rx_buffs[] = {rx_buffer};
         int flags;        // flags set by receive operation
         long long timeNs; //timestamp for receive buffer
 
         // считали буффер RX, записали его в rx_buffer
         int sr = SoapySDRDevice_readStream(sdr, rxStream, rx_buffs, rx_mtu, &flags, &timeNs, timeoutUs);
-        vector<complex<float>> f = from_file(rx_buffer, 2*sr);
-        to_file(f,rx_cbuffer, 2*sr);
+        if (sr>0){
+        vector<complex<float>> f = from_file(rx_buffer, 2u*sr);
+        auto filtered1 = convolve(f);  
+        auto sync_indices = offset(filtered1); 
+        
+        vector<complex<float>> synced_samples;
+
+        for (float idx : sync_indices) {
+            if (idx < filtered1.size()) {
+                synced_samples.push_back(filtered1[idx]); 
+            }
+        }
+
+        
+        {
+        lock_guard<mutex> lock(shared.mtx);
+        shared.rx_samples = std::move(synced_samples);
+        }
+        to_file(shared.rx_samples,rx_cbuffer, 2u*sr);
+    }
+        
+        
+
         size_t samples_written = fwrite(rx_cbuffer, sizeof(int16_t), 2 * sr, rxfile);
                
            
@@ -293,13 +452,7 @@ int main(){
         int tx_flags = SOAPY_SDR_HAS_TIME;
         int st = SoapySDRDevice_writeStream(sdr, txStream, tx_buffs, tx_mtu, &tx_flags, tx_time, timeoutUs);
         
-
-        // Прогресс каждые 10 итераций
-        if (buffers_read % 10 == 0) {
-            printf("Progress: buffer %lu/%lu, RX: %zu samples, TX: %zu samples\n", 
-            buffers_read, iteration_count, total_rx_samples, total_tx_samples);
-        }
-        
+        this_thread::sleep_for(chrono::milliseconds(90));
         
     }
         
@@ -320,5 +473,13 @@ int main(){
     //cleanup device handle
     SoapySDRDevice_unmake(sdr);
 
+   
+}
+int main(){
+    thread sdr_thread(sdr_work);  // Все используют глобальную shared_data
+    run_gui();
+
+    shared.program_running = false;
+    sdr_thread.join();
     return 0;
 }

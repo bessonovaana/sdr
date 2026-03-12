@@ -1,0 +1,7 @@
+.venv/
+.vscode/
+libad9361-iio/
+libiio/
+SoapyPlutoSDR/
+SoapySDR/
+/SoapySDR/
