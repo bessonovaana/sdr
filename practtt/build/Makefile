@@ -179,6 +179,30 @@ src/main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
+src/mapper.o: src/mapper.cpp.o
+.PHONY : src/mapper.o
+
+# target to build an object file
+src/mapper.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/mapper.cpp.o
+.PHONY : src/mapper.cpp.o
+
+src/mapper.i: src/mapper.cpp.i
+.PHONY : src/mapper.i
+
+# target to preprocess a source file
+src/mapper.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/mapper.cpp.i
+.PHONY : src/mapper.cpp.i
+
+src/mapper.s: src/mapper.cpp.s
+.PHONY : src/mapper.s
+
+# target to generate assembly for a file
+src/mapper.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/mapper.cpp.s
+.PHONY : src/mapper.cpp.s
+
 third_party/imgui/backends/imgui_impl_opengl3.o: third_party/imgui/backends/imgui_impl_opengl3.cpp.o
 .PHONY : third_party/imgui/backends/imgui_impl_opengl3.o
 
@@ -433,6 +457,9 @@ help:
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
+	@echo "... src/mapper.o"
+	@echo "... src/mapper.i"
+	@echo "... src/mapper.s"
 	@echo "... third_party/imgui/backends/imgui_impl_opengl3.o"
 	@echo "... third_party/imgui/backends/imgui_impl_opengl3.i"
 	@echo "... third_party/imgui/backends/imgui_impl_opengl3.s"

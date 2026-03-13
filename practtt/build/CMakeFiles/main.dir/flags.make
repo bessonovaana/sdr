@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I"/home/anastasia/Рабочий стол/sdr/practtt/include" -I"/home/anastasia/Рабочий стол/sdr/practtt/third_party/imgui" -I"/home/anastasia/Рабочий стол/sdr/practtt/third_party/imgui/backends" -I"/home/anastasia/Рабочий стол/sdr/practtt/third_party/implot" -isystem /usr/include/SDL2
+CXX_INCLUDES = -I"/home/anastasia/Рабочий стол/sdr/practtt/include" -I"/home/anastasia/Рабочий стол/sdr/practtt/src" -I"/home/anastasia/Рабочий стол/sdr/practtt/third_party/imgui" -I"/home/anastasia/Рабочий стол/sdr/practtt/third_party/imgui/backends" -I"/home/anastasia/Рабочий стол/sdr/practtt/third_party/implot" -isystem /usr/include/SDL2
 
 CXX_FLAGS = -g -std=gnu++17 -Wall -Wextra -Wnon-virtual-dtor
 

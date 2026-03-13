@@ -83,14 +83,30 @@ CMakeFiles/main.dir/src/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/main.dir/src/main.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/home/anastasia/Рабочий стол/sdr/practtt/src/main.cpp" -o CMakeFiles/main.dir/src/main.cpp.s
 
+CMakeFiles/main.dir/src/mapper.cpp.o: CMakeFiles/main.dir/flags.make
+CMakeFiles/main.dir/src/mapper.cpp.o: /home/anastasia/Рабочий\ стол/sdr/practtt/src/mapper.cpp
+CMakeFiles/main.dir/src/mapper.cpp.o: CMakeFiles/main.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/home/anastasia/Рабочий стол/sdr/practtt/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/main.dir/src/mapper.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/main.dir/src/mapper.cpp.o -MF CMakeFiles/main.dir/src/mapper.cpp.o.d -o CMakeFiles/main.dir/src/mapper.cpp.o -c "/home/anastasia/Рабочий стол/sdr/practtt/src/mapper.cpp"
+
+CMakeFiles/main.dir/src/mapper.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/main.dir/src/mapper.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/home/anastasia/Рабочий стол/sdr/practtt/src/mapper.cpp" > CMakeFiles/main.dir/src/mapper.cpp.i
+
+CMakeFiles/main.dir/src/mapper.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/main.dir/src/mapper.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/home/anastasia/Рабочий стол/sdr/practtt/src/mapper.cpp" -o CMakeFiles/main.dir/src/mapper.cpp.s
+
 # Object files for target main
 main_OBJECTS = \
-"CMakeFiles/main.dir/src/main.cpp.o"
+"CMakeFiles/main.dir/src/main.cpp.o" \
+"CMakeFiles/main.dir/src/mapper.cpp.o"
 
 # External object files for target main
 main_EXTERNAL_OBJECTS =
 
 main: CMakeFiles/main.dir/src/main.cpp.o
+main: CMakeFiles/main.dir/src/mapper.cpp.o
 main: CMakeFiles/main.dir/build.make
 main: /usr/local/lib/libSoapySDR.so.0.8.1
 main: libimgui.a
@@ -106,7 +122,7 @@ main: /usr/lib/x86_64-linux-gnu/libGLU.so
 main: /usr/lib/x86_64-linux-gnu/libGLEW.so
 main: /usr/lib/x86_64-linux-gnu/libSDL2.so
 main: CMakeFiles/main.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir="/home/anastasia/Рабочий стол/sdr/practtt/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable main"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir="/home/anastasia/Рабочий стол/sdr/practtt/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable main"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/main.dir/link.txt --verbose=$(VERBOSE)
 	/usr/bin/cmake
 

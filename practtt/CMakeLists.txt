@@ -90,6 +90,7 @@ endif()
 # Собираем список исходных файлов
 set(MAIN_SOURCE_FILES
     ${SRC_DIR}/main.cpp
+    ${SRC_DIR}/mapper.cpp
 )
 
 # Добавляем исполняемый файл
@@ -114,6 +115,7 @@ endif()
 # Подключаем директории для компиляции основного приложения
 target_include_directories(main PRIVATE
     ${INCLUDE_DIR}
+    ${SRC_DIR}
     ${SDL2_INCLUDE_DIRS}
     ${SoapySDR_INCLUDE_DIRS}
     ${OPENGL_INCLUDE_DIRS}

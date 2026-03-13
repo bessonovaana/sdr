@@ -21,6 +21,8 @@
 #include "../include/imgui.h"
 #include "../include/implot.h"
 
+#include "../include/mapper.h"
+
 
 
 using namespace std;
@@ -201,20 +203,14 @@ vector<complex<float>> convolve(const vector<complex<float>>& x) {
     
     return y;
 }
-void bpsk (std::vector<int16_t>in, std::vector<std::complex<float>>&out){
-    
-    std::complex<float> val;
-    for (int i=0; i<in.size();i++){
-        if (in[i]==1){
-            val = 1.0 + 0.0f;
-        }
-        else{
-            val = -1.0 + 0.0f;
-        }
-        out.push_back(val);
-    }
-
-}
+// std::vector<std::complex<float>> bpsk (std::vector<int16_t>in){
+//    std::vector<std::complex<float>>out;
+//     for (int i=0; i<in.size(); i++){
+//         out.push_back((1/sqrt(2))* (1 - 2*in[i])),
+//         ((1/sqrt(2))*(1-2*in[i]));
+//     }
+//     return out;
+// }
 
 vector<complex<float>> modulate(const vector<complex<float>>& in, int step) {
     vector<complex<float>> upbits;
@@ -266,8 +262,8 @@ vector<float> offset(vector<complex<float>> matched)
 {
     int samples_per_symbol = 10;
     int K1, K2, p1, p2 = 0;
-    float BnTs = 0.0001;
-    float Kp = 0.0002;
+    float BnTs = 0.001;
+    float Kp = 0.002;
     float zeta = sqrt(2) / 2;
     float theta = (BnTs / samples_per_symbol) / (zeta + (0.25 / zeta));
     K1 = -4 * zeta * theta / ( (1 + 2 * zeta * theta + pow(theta,2)) * Kp);
@@ -314,7 +310,7 @@ SoapySDRKwargs args = {};
     SoapySDRKwargs_clear(&args);
 
     int sample_rate = 1e6;
-    int carrier_freq = 888e6;
+    int carrier_freq = 900e6;
     // Параметры RX части
     SoapySDRDevice_setSampleRate(sdr, SOAPY_SDR_RX, 0, sample_rate);
     SoapySDRDevice_setFrequency(sdr, SOAPY_SDR_RX, 0, carrier_freq , NULL);
@@ -327,7 +323,7 @@ SoapySDRKwargs args = {};
     size_t channels[] = {0};
     // Настройки усилителей на RX\\TX
     SoapySDRDevice_setGain(sdr, SOAPY_SDR_RX, 0, 50.0); // Чувствительность приемника
-    SoapySDRDevice_setGain(sdr, SOAPY_SDR_TX, 0, 50.0);// Усиление передатчика
+    SoapySDRDevice_setGain(sdr, SOAPY_SDR_TX, 0, 60.0);// Усиление передатчика
 
     int channel_count = 1;
     // Формирование потоков для передачи и приема сэмплов
@@ -346,10 +342,8 @@ SoapySDRKwargs args = {};
     int16_t rx_buffer[2*rx_mtu];
     int16_t rx_cbuffer[2*rx_mtu];
 
-    vector<int16_t> bits = generate_bits(100);
-    vector<complex<float>>bbits;
-    
-    bpsk(bits, bbits);
+    vector<int16_t> bits = generate_bits(1000);
+    vector<complex<float>>bbits=bpsk(bits);
 
     
 
@@ -396,8 +390,8 @@ SoapySDRKwargs args = {};
     
 
     // Начинается работа с получением и отправкой сэмплов
-   while (shared.program_running){
-   //for (size_t buffers_read = 0; buffers_read < iteration_count; buffers_read++){
+   //while (shared.program_running){
+   for (size_t buffers_read = 0; buffers_read < iteration_count; buffers_read++){
         
         void *rx_buffs[] = {rx_buffer};
         int flags;        // flags set by receive operation
@@ -452,7 +446,7 @@ SoapySDRKwargs args = {};
         int tx_flags = SOAPY_SDR_HAS_TIME;
         int st = SoapySDRDevice_writeStream(sdr, txStream, tx_buffs, tx_mtu, &tx_flags, tx_time, timeoutUs);
         
-        this_thread::sleep_for(chrono::milliseconds(90));
+        //this_thread::sleep_for(chrono::milliseconds(1000));
         
     }
         
