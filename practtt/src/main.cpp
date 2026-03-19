@@ -15,6 +15,10 @@
 #include <mutex>
 #include <cmath>
 #include <chrono>
+#include <numeric>
+#include <algorithm>
+#include <numbers> 
+
 
 #include "../third_party/imgui/backends/imgui_impl_opengl3.h"
 #include "../third_party/imgui/backends/imgui_impl_sdl2.h"
@@ -203,14 +207,7 @@ vector<complex<float>> convolve(const vector<complex<float>>& x) {
     
     return y;
 }
-// std::vector<std::complex<float>> bpsk (std::vector<int16_t>in){
-//    std::vector<std::complex<float>>out;
-//     for (int i=0; i<in.size(); i++){
-//         out.push_back((1/sqrt(2))* (1 - 2*in[i])),
-//         ((1/sqrt(2))*(1-2*in[i]));
-//     }
-//     return out;
-// }
+
 
 vector<complex<float>> modulate(const vector<complex<float>>& in, int step) {
     vector<complex<float>> upbits;
@@ -258,6 +255,7 @@ vector<complex<float>> from_file(int16_t buff[], int size){
     return sv2;
 }
 
+
 vector<float> offset(vector<complex<float>> matched) 
 {
     int samples_per_symbol = 10;
@@ -291,8 +289,42 @@ vector<float> offset(vector<complex<float>> matched)
         tau = ceil(p2 * samples_per_symbol);
         errof.push_back(i + samples_per_symbol + tau);
         }
+        
         return errof;
     }
+
+std::vector<std::complex<float>> symbol_sync(std::vector<std::complex<float>> &matched)
+{
+    int nsps =10;
+    std::vector<float> ted_idxs = offset(matched);
+
+    std::vector<std::complex<float>> symb_samples;
+    for (float idx : ted_idxs) {
+            if (idx < matched.size()) {
+                symb_samples.push_back(matched[idx]); 
+            }
+        }
+        
+
+    return symb_samples;
+
+}
+std::vector<complex<float>> freq_synq(vector <complex<float>> &in, double coarse_freq, int buffer_size, int sample_rate){
+    std::vector<std::complex<float>> out;
+    out.resize(buffer_size);
+    double Ts = 1.0f / sample_rate;
+    vector <float> times;
+    for (double val = 0.0; val < Ts * buffer_size; val += Ts) {
+        times.push_back(val);
+    }
+    for (int i=0; i<buffer_size; i++){
+        complex<float> val = complex<float>(0.0, -1.0f*2.0*M_PI*(coarse_freq)*times[i]);
+        out[i]=in[i]*exp(val);
+    }
+    return out;
+
+}
+
 
 void sdr_work(){
 SoapySDRKwargs args = {};
@@ -310,7 +342,7 @@ SoapySDRKwargs args = {};
     SoapySDRKwargs_clear(&args);
 
     int sample_rate = 1e6;
-    int carrier_freq = 900e6;
+    int carrier_freq = 700e6;
     // Параметры RX части
     SoapySDRDevice_setSampleRate(sdr, SOAPY_SDR_RX, 0, sample_rate);
     SoapySDRDevice_setFrequency(sdr, SOAPY_SDR_RX, 0, carrier_freq , NULL);
@@ -323,7 +355,7 @@ SoapySDRKwargs args = {};
     size_t channels[] = {0};
     // Настройки усилителей на RX\\TX
     SoapySDRDevice_setGain(sdr, SOAPY_SDR_RX, 0, 50.0); // Чувствительность приемника
-    SoapySDRDevice_setGain(sdr, SOAPY_SDR_TX, 0, 60.0);// Усиление передатчика
+    SoapySDRDevice_setGain(sdr, SOAPY_SDR_TX, 0, 50.0);// Усиление передатчика
 
     int channel_count = 1;
     // Формирование потоков для передачи и приема сэмплов
@@ -341,9 +373,14 @@ SoapySDRKwargs args = {};
     int16_t tx_buff[2*tx_mtu];
     int16_t rx_buffer[2*rx_mtu];
     int16_t rx_cbuffer[2*rx_mtu];
+    vector<int16_t> preambule = generate_bits(10);
+    vector<int16_t> bits = generate_bits(500);
 
-    vector<int16_t> bits = generate_bits(1000);
-    vector<complex<float>>bbits=bpsk(bits);
+   
+  
+
+
+    vector<complex<float>>bbits=qpsk(bits);
 
     
 
@@ -400,24 +437,16 @@ SoapySDRKwargs args = {};
         // считали буффер RX, записали его в rx_buffer
         int sr = SoapySDRDevice_readStream(sdr, rxStream, rx_buffs, rx_mtu, &flags, &timeNs, timeoutUs);
         if (sr>0){
-        vector<complex<float>> f = from_file(rx_buffer, 2u*sr);
+        vector<complex<float>> f = from_file(rx_buffer, 2*sr);
         auto filtered1 = convolve(f);  
-        auto sync_indices = offset(filtered1); 
-        
-        vector<complex<float>> synced_samples;
-
-        for (float idx : sync_indices) {
-            if (idx < filtered1.size()) {
-                synced_samples.push_back(filtered1[idx]); 
-            }
-        }
-
+        auto sync_sam = symbol_sync(filtered1); 
+        auto freq_sam = freq_synq(sync_sam, carrier_freq, sync_sam.size(),sample_rate);
         
         {
         lock_guard<mutex> lock(shared.mtx);
-        shared.rx_samples = std::move(synced_samples);
+        shared.rx_samples = std::move(freq_sam);
         }
-        to_file(shared.rx_samples,rx_cbuffer, 2u*sr);
+        to_file(shared.rx_samples,rx_cbuffer, 2*sr);
     }
         
         

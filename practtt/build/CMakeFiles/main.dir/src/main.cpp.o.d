@@ -330,7 +330,13 @@ CMakeFiles/main.dir/src/main.cpp.o: \
  /usr/include/c++/13/atomic /usr/include/c++/13/bits/atomic_base.h \
  /usr/include/c++/13/bits/atomic_lockfree_defines.h \
  /usr/include/c++/13/mutex /usr/include/c++/13/bits/std_mutex.h \
- /usr/include/c++/13/bits/unique_lock.h \
+ /usr/include/c++/13/bits/unique_lock.h /usr/include/c++/13/algorithm \
+ /usr/include/c++/13/bits/stl_algo.h \
+ /usr/include/c++/13/bits/algorithmfwd.h \
+ /usr/include/c++/13/bits/stl_heap.h \
+ /usr/include/c++/13/bits/stl_tempbuf.h \
+ /usr/include/c++/13/pstl/glue_algorithm_defs.h \
+ /usr/include/c++/13/numbers \
  /home/anastasia/Рабочий\ стол/sdr/practtt/src/../third_party/imgui/backends/imgui_impl_opengl3.h \
  /home/anastasia/Рабочий\ стол/sdr/practtt/include/imgui.h \
  /home/anastasia/Рабочий\ стол/sdr/practtt/third_party/imgui/imconfig.h \

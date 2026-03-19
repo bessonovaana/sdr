@@ -155,6 +155,30 @@ main/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/build
 .PHONY : main/fast
 
+include/mapper.o: include/mapper.cpp.o
+.PHONY : include/mapper.o
+
+# target to build an object file
+include/mapper.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/include/mapper.cpp.o
+.PHONY : include/mapper.cpp.o
+
+include/mapper.i: include/mapper.cpp.i
+.PHONY : include/mapper.i
+
+# target to preprocess a source file
+include/mapper.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/include/mapper.cpp.i
+.PHONY : include/mapper.cpp.i
+
+include/mapper.s: include/mapper.cpp.s
+.PHONY : include/mapper.s
+
+# target to generate assembly for a file
+include/mapper.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/include/mapper.cpp.s
+.PHONY : include/mapper.cpp.s
+
 src/main.o: src/main.cpp.o
 .PHONY : src/main.o
 
@@ -178,30 +202,6 @@ src/main.s: src/main.cpp.s
 src/main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
-
-src/mapper.o: src/mapper.cpp.o
-.PHONY : src/mapper.o
-
-# target to build an object file
-src/mapper.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/mapper.cpp.o
-.PHONY : src/mapper.cpp.o
-
-src/mapper.i: src/mapper.cpp.i
-.PHONY : src/mapper.i
-
-# target to preprocess a source file
-src/mapper.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/mapper.cpp.i
-.PHONY : src/mapper.cpp.i
-
-src/mapper.s: src/mapper.cpp.s
-.PHONY : src/mapper.s
-
-# target to generate assembly for a file
-src/mapper.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/mapper.cpp.s
-.PHONY : src/mapper.cpp.s
 
 third_party/imgui/backends/imgui_impl_opengl3.o: third_party/imgui/backends/imgui_impl_opengl3.cpp.o
 .PHONY : third_party/imgui/backends/imgui_impl_opengl3.o
@@ -454,12 +454,12 @@ help:
 	@echo "... imgui"
 	@echo "... implot"
 	@echo "... main"
+	@echo "... include/mapper.o"
+	@echo "... include/mapper.i"
+	@echo "... include/mapper.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
-	@echo "... src/mapper.o"
-	@echo "... src/mapper.i"
-	@echo "... src/mapper.s"
 	@echo "... third_party/imgui/backends/imgui_impl_opengl3.o"
 	@echo "... third_party/imgui/backends/imgui_impl_opengl3.i"
 	@echo "... third_party/imgui/backends/imgui_impl_opengl3.s"

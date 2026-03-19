@@ -90,7 +90,7 @@ endif()
 # Собираем список исходных файлов
 set(MAIN_SOURCE_FILES
     ${SRC_DIR}/main.cpp
-    ${SRC_DIR}/mapper.cpp
+    ${INCLUDE_DIR}/mapper.cpp
 )
 
 # Добавляем исполняемый файл
