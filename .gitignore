@@ -5,3 +5,4 @@ libiio/
 SoapyPlutoSDR/
 SoapySDR/
 /SoapySDR/
+.gitignore
