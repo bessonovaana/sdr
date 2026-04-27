@@ -155,29 +155,29 @@ main/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/build
 .PHONY : main/fast
 
-include/mapper.o: include/mapper.cpp.o
-.PHONY : include/mapper.o
+src/gui.o: src/gui.cpp.o
+.PHONY : src/gui.o
 
 # target to build an object file
-include/mapper.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/include/mapper.cpp.o
-.PHONY : include/mapper.cpp.o
+src/gui.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/gui.cpp.o
+.PHONY : src/gui.cpp.o
 
-include/mapper.i: include/mapper.cpp.i
-.PHONY : include/mapper.i
+src/gui.i: src/gui.cpp.i
+.PHONY : src/gui.i
 
 # target to preprocess a source file
-include/mapper.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/include/mapper.cpp.i
-.PHONY : include/mapper.cpp.i
+src/gui.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/gui.cpp.i
+.PHONY : src/gui.cpp.i
 
-include/mapper.s: include/mapper.cpp.s
-.PHONY : include/mapper.s
+src/gui.s: src/gui.cpp.s
+.PHONY : src/gui.s
 
 # target to generate assembly for a file
-include/mapper.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/include/mapper.cpp.s
-.PHONY : include/mapper.cpp.s
+src/gui.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/gui.cpp.s
+.PHONY : src/gui.cpp.s
 
 src/main.o: src/main.cpp.o
 .PHONY : src/main.o
@@ -202,6 +202,78 @@ src/main.s: src/main.cpp.s
 src/main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
+
+src/mapper.o: src/mapper.cpp.o
+.PHONY : src/mapper.o
+
+# target to build an object file
+src/mapper.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/mapper.cpp.o
+.PHONY : src/mapper.cpp.o
+
+src/mapper.i: src/mapper.cpp.i
+.PHONY : src/mapper.i
+
+# target to preprocess a source file
+src/mapper.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/mapper.cpp.i
+.PHONY : src/mapper.cpp.i
+
+src/mapper.s: src/mapper.cpp.s
+.PHONY : src/mapper.s
+
+# target to generate assembly for a file
+src/mapper.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/mapper.cpp.s
+.PHONY : src/mapper.cpp.s
+
+src/rx.o: src/rx.cpp.o
+.PHONY : src/rx.o
+
+# target to build an object file
+src/rx.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/rx.cpp.o
+.PHONY : src/rx.cpp.o
+
+src/rx.i: src/rx.cpp.i
+.PHONY : src/rx.i
+
+# target to preprocess a source file
+src/rx.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/rx.cpp.i
+.PHONY : src/rx.cpp.i
+
+src/rx.s: src/rx.cpp.s
+.PHONY : src/rx.s
+
+# target to generate assembly for a file
+src/rx.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/rx.cpp.s
+.PHONY : src/rx.cpp.s
+
+src/tx.o: src/tx.cpp.o
+.PHONY : src/tx.o
+
+# target to build an object file
+src/tx.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/tx.cpp.o
+.PHONY : src/tx.cpp.o
+
+src/tx.i: src/tx.cpp.i
+.PHONY : src/tx.i
+
+# target to preprocess a source file
+src/tx.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/tx.cpp.i
+.PHONY : src/tx.cpp.i
+
+src/tx.s: src/tx.cpp.s
+.PHONY : src/tx.s
+
+# target to generate assembly for a file
+src/tx.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/tx.cpp.s
+.PHONY : src/tx.cpp.s
 
 third_party/imgui/backends/imgui_impl_opengl3.o: third_party/imgui/backends/imgui_impl_opengl3.cpp.o
 .PHONY : third_party/imgui/backends/imgui_impl_opengl3.o
@@ -454,12 +526,21 @@ help:
 	@echo "... imgui"
 	@echo "... implot"
 	@echo "... main"
-	@echo "... include/mapper.o"
-	@echo "... include/mapper.i"
-	@echo "... include/mapper.s"
+	@echo "... src/gui.o"
+	@echo "... src/gui.i"
+	@echo "... src/gui.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
+	@echo "... src/mapper.o"
+	@echo "... src/mapper.i"
+	@echo "... src/mapper.s"
+	@echo "... src/rx.o"
+	@echo "... src/rx.i"
+	@echo "... src/rx.s"
+	@echo "... src/tx.o"
+	@echo "... src/tx.i"
+	@echo "... src/tx.s"
 	@echo "... third_party/imgui/backends/imgui_impl_opengl3.o"
 	@echo "... third_party/imgui/backends/imgui_impl_opengl3.i"
 	@echo "... third_party/imgui/backends/imgui_impl_opengl3.s"

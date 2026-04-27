@@ -343,4 +343,8 @@ CMakeFiles/main.dir/src/main.cpp.o: \
  /usr/include/assert.h \
  /home/anastasia/Рабочий\ стол/sdr/practtt/src/../third_party/imgui/backends/imgui_impl_sdl2.h \
  /home/anastasia/Рабочий\ стол/sdr/practtt/src/../include/implot.h \
- /home/anastasia/Рабочий\ стол/sdr/practtt/src/../include/mapper.h
+ /home/anastasia/Рабочий\ стол/sdr/practtt/include/mapper.h \
+ /home/anastasia/Рабочий\ стол/sdr/practtt/include/main.h \
+ /home/anastasia/Рабочий\ стол/sdr/practtt/include/gui.h \
+ /home/anastasia/Рабочий\ стол/sdr/practtt/include/tx.h \
+ /home/anastasia/Рабочий\ стол/sdr/practtt/include/rx.h

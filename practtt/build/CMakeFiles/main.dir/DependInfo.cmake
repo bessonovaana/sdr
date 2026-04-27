@@ -8,8 +8,11 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/home/anastasia/Рабочий стол/sdr/practtt/include/mapper.cpp" "CMakeFiles/main.dir/include/mapper.cpp.o" "gcc" "CMakeFiles/main.dir/include/mapper.cpp.o.d"
+  "/home/anastasia/Рабочий стол/sdr/practtt/src/gui.cpp" "CMakeFiles/main.dir/src/gui.cpp.o" "gcc" "CMakeFiles/main.dir/src/gui.cpp.o.d"
   "/home/anastasia/Рабочий стол/sdr/practtt/src/main.cpp" "CMakeFiles/main.dir/src/main.cpp.o" "gcc" "CMakeFiles/main.dir/src/main.cpp.o.d"
+  "/home/anastasia/Рабочий стол/sdr/practtt/src/mapper.cpp" "CMakeFiles/main.dir/src/mapper.cpp.o" "gcc" "CMakeFiles/main.dir/src/mapper.cpp.o.d"
+  "/home/anastasia/Рабочий стол/sdr/practtt/src/rx.cpp" "CMakeFiles/main.dir/src/rx.cpp.o" "gcc" "CMakeFiles/main.dir/src/rx.cpp.o.d"
+  "/home/anastasia/Рабочий стол/sdr/practtt/src/tx.cpp" "CMakeFiles/main.dir/src/tx.cpp.o" "gcc" "CMakeFiles/main.dir/src/tx.cpp.o.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

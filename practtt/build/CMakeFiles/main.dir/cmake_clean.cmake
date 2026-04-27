@@ -1,8 +1,14 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/main.dir/include/mapper.cpp.o"
-  "CMakeFiles/main.dir/include/mapper.cpp.o.d"
+  "CMakeFiles/main.dir/src/gui.cpp.o"
+  "CMakeFiles/main.dir/src/gui.cpp.o.d"
   "CMakeFiles/main.dir/src/main.cpp.o"
   "CMakeFiles/main.dir/src/main.cpp.o.d"
+  "CMakeFiles/main.dir/src/mapper.cpp.o"
+  "CMakeFiles/main.dir/src/mapper.cpp.o.d"
+  "CMakeFiles/main.dir/src/rx.cpp.o"
+  "CMakeFiles/main.dir/src/rx.cpp.o.d"
+  "CMakeFiles/main.dir/src/tx.cpp.o"
+  "CMakeFiles/main.dir/src/tx.cpp.o.d"
   "main"
   "main.pdb"
 )
