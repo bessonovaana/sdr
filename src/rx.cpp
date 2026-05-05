@@ -1,6 +1,31 @@
 #include"rx.h"
 #include <iostream>
 
+// 🔹 arange: аналог numpy.arange
+inline std::vector<double> arange(double start, double stop, double step) {
+    std::vector<double> result;
+    if (step <= 0) return result;
+    for (double val = start; val < stop; val += step) {
+        result.push_back(val);
+    }
+    return result;
+}
+
+// 🔹 fftshift_1d: сдвиг нуля в центр спектра
+inline void fftshift_1d(std::vector<double>& data, int size) {
+    if (size <= 1) return;
+    std::vector<double> temp = data;
+    const int half = size / 2;
+    for (int i = 0; i < size; ++i) {
+        data[i] = temp[(i + half) % size];
+    }
+}
+
+// 🔹 sgn: функция знака
+inline float sgn(float val) {
+    return (0.0f < val) - (val < 0.0f);
+}
+
 vector<float> offset(vector<complex<float>> matched) 
 {
     int samples_per_symbol = 10;
@@ -87,6 +112,65 @@ std::vector<std::complex<float>> freq_synq(std::vector<std::complex<float>> &in,
 
     return out;
 }
+
+#include <fftw3.h>
+
+float coarse_max_freq_calculation(const std::vector<std::complex<float>>& samples, 
+                                  int buffer_size, 
+                                  int sample_rate)
+{
+    //  Выделение памяти + инициализация
+    std::vector<std::complex<double>> fft_in(buffer_size);
+    std::vector<std::complex<double>> fft_out(buffer_size);
+    std::vector<double> fft_mag(buffer_size);
+    
+    // 🔥 Копирование с приведением float→double
+    for (int i = 0; i < buffer_size && i < static_cast<int>(samples.size()); ++i) {
+        fft_in[i] = static_cast<std::complex<double>>(samples[i]);
+    }
+
+    // Возведение в квадрат: z*z вместо pow(z,2)
+    for (int i = 0; i < buffer_size; ++i) {
+        fft_in[i] = fft_in[i] * fft_in[i];  // Для BPSK: убираем модуляцию
+    }
+
+    // План FFTW
+    fftw_plan plan = fftw_plan_dft_1d(buffer_size,
+                                      reinterpret_cast<fftw_complex*>(fft_in.data()),
+                                      reinterpret_cast<fftw_complex*>(fft_out.data()),
+                                      FFTW_FORWARD,
+                                      FFTW_ESTIMATE);
+    
+    fftw_execute(plan);
+    fftw_destroy_plan(plan); 
+    
+    // Амплитудный спектр
+    for (int i = 0; i < buffer_size; ++i) {
+        fft_mag[i] = std::abs(fft_out[i]);
+    }
+
+    // Сдвиг нуля в центр (если fftshift_1d не реализована — вот простая версия)
+    std::vector<double> fft_mag_shifted(buffer_size);
+    const int half = buffer_size / 2;
+    for (int i = 0; i < buffer_size; ++i) {
+        fft_mag_shifted[i] = fft_mag[(i + half) % buffer_size];
+    }
+
+    // Вектор частот
+    const double df = static_cast<double>(sample_rate) / static_cast<double>(buffer_size);
+    std::vector<double> freqs(buffer_size);
+    for (int i = 0; i < buffer_size; ++i) {
+        freqs[i] = (i - half) * df;  // От -Fs/2 до +Fs/2
+    }
+    
+    //  Поиск пика
+    auto max_it = std::max_element(fft_mag_shifted.begin(), fft_mag_shifted.end());
+    const int peak_idx = static_cast<int>(std::distance(fft_mag_shifted.begin(), max_it));
+    
+    // Деление на 2: т.к. сигнал был возведён в квадрат (частота удвоилась)
+    return static_cast<float>(freqs[peak_idx] * 0.5);
+}
+
 std::vector<std::complex<float>> costas_loop_bpsk(const std::vector<std::complex<float>>& samples) {
     int N = samples.size();
     double phase = 0.0f;
